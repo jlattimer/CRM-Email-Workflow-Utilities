@@ -11,9 +11,9 @@ using System.Linq;
 
 namespace LAT.WorkflowUtilities.Email
 {
-    public class EmailBusinessUnitQueue : WorkFlowActivityBase
+    public class CcBusinessUnitQueue : WorkFlowActivityBase
     {
-        public EmailBusinessUnitQueue() : base(typeof(EmailBusinessUnitQueue)) { }
+        public CcBusinessUnitQueue() : base(typeof(EmailBusinessUnitQueue)) { }
 
         [RequiredArgument]
         [Input("Email To Send")]
@@ -21,7 +21,7 @@ namespace LAT.WorkflowUtilities.Email
         public InArgument<EntityReference> EmailToSend { get; set; }
 
         [RequiredArgument]
-        [Input("Recipient Business Unit")]
+        [Input("CC Business Unit")]
         [ReferenceTarget("businessunit")]
         public InArgument<EntityReference> RecipientBusinessUnit { get; set; }
 
@@ -44,7 +44,7 @@ namespace LAT.WorkflowUtilities.Email
             EntityReference recipientBusinessUnit = RecipientBusinessUnit.Get(context);
             bool sendEmail = SendEmail.Get(context);
 
-            List<Entity> toList = new List<Entity>();
+            List<Entity> ccList = new List<Entity>();
 
             Entity email = RetrieveEmail(localContext.OrganizationService, emailToSend.Id);
 
@@ -57,7 +57,7 @@ namespace LAT.WorkflowUtilities.Email
             //Add any pre-defined recipients specified to the array               
             foreach (Entity activityParty in email.GetAttributeValue<EntityCollection>("to").Entities)
             {
-                toList.Add(activityParty);
+                ccList.Add(activityParty);
             }
 
             EntityCollection buQueues = GetBuQueues(localContext.OrganizationService, recipientBusinessUnit.Id);
@@ -73,10 +73,10 @@ namespace LAT.WorkflowUtilities.Email
                 localContext.Trace("GetBuQueue found more than one default queue for the Business Unit.");
             }
 
-            toList = ProcessQueues(buQueues, toList);
+            ccList = ProcessQueues(buQueues, ccList);
 
             //Update the email
-            email["to"] = toList.ToArray();
+            email["cc"] = ccList.ToArray();
             localContext.OrganizationService.Update(email);
 
             //Send
@@ -100,10 +100,10 @@ namespace LAT.WorkflowUtilities.Email
 
         private static Entity RetrieveEmail(IOrganizationService service, Guid emailId)
         {
-            return service.Retrieve("email", emailId, new ColumnSet("to"));
+            return service.Retrieve("email", emailId, new ColumnSet("cc"));
         }
 
-        private static List<Entity> ProcessQueues(EntityCollection queues, List<Entity> toList)
+        private static List<Entity> ProcessQueues(EntityCollection queues, List<Entity> ccList)
         {
             foreach (Entity e in queues.Entities)
             {
@@ -113,12 +113,12 @@ namespace LAT.WorkflowUtilities.Email
                         ["partyid"] = new EntityReference(e.LogicalName, e.Id)
                     };
 
-                if (toList.Any(t => t.GetAttributeValue<EntityReference>("partyid").Id == e.Id)) continue;
+                if (ccList.Any(t => t.GetAttributeValue<EntityReference>("partyid").Id == e.Id)) continue;
 
-                toList.Add(activityParty);
+                ccList.Add(activityParty);
             }
 
-            return toList;
+            return ccList;
         }
 
         private static EntityCollection GetBuQueues(IOrganizationService service, Guid businessUnitId)

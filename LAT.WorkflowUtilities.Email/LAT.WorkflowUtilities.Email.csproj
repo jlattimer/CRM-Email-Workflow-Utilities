@@ -74,6 +74,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CcBusinessUnit.cs" />
+    <Compile Include="CcBusinessUnitQueue.cs" />
     <Compile Include="CreateTemplate.cs" />
     <Compile Include="DeleteAttachmentByName.cs" />
     <Compile Include="DynamicUrlParser.cs" />
