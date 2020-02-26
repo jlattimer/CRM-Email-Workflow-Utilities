@@ -64,20 +64,21 @@ namespace LAT.WorkflowUtilities.Email
 
             if (buQueues.Entities.Count < 1)
             {
-                EmailSent.Set(context, false);
                 localContext.Trace("GetBuQueue found no default queues for the Business Unit.");
-                return;
             }
-            else if (buQueues.Entities.Count > 1)
+            else
             {
-                localContext.Trace("GetBuQueue found more than one default queue for the Business Unit.");
+                if (buQueues.Entities.Count > 1)
+                {
+                    localContext.Trace("GetBuQueue found more than one default queue for the Business Unit.");
+                }
+
+                toList = ProcessQueues(buQueues, toList);
+
+                //Update the email
+                email["to"] = toList.ToArray();
+                localContext.OrganizationService.Update(email);
             }
-
-            toList = ProcessQueues(buQueues, toList);
-
-            //Update the email
-            email["to"] = toList.ToArray();
-            localContext.OrganizationService.Update(email);
 
             //Send
             if (sendEmail)
