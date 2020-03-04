@@ -33,6 +33,9 @@ namespace LAT.WorkflowUtilities.Email
         [Output("Email Sent")]
         public OutArgument<bool> EmailSent { get; set; }
 
+        [Output("Users Added")]
+        public OutArgument<int> UsersAdded { get; set; }
+
         protected override void ExecuteCrmWorkFlowActivity(CodeActivityContext context, LocalWorkflowContext localContext)
         {
             if (context == null)
@@ -51,6 +54,7 @@ namespace LAT.WorkflowUtilities.Email
             if (email == null)
             {
                 EmailSent.Set(context, false);
+                UsersAdded.Set(context, 0);
                 return;
             }
 
@@ -97,6 +101,8 @@ namespace LAT.WorkflowUtilities.Email
             {
                 EmailSent.Set(context, false);
             }
+
+            UsersAdded.Set(context, ccList.Count);
         }
 
         private static Entity RetrieveEmail(IOrganizationService service, Guid emailId)
@@ -152,6 +158,18 @@ namespace LAT.WorkflowUtilities.Email
                         LinkToEntityName = "team",
                         LinkToAttributeName = "queueid",
                         LinkCriteria = filter
+                    }
+                },
+                Criteria = new FilterExpression
+                {
+                    Conditions =
+                    {
+                        new ConditionExpression
+                        {
+                            AttributeName = "statecode",
+                            Operator = ConditionOperator.Equal,
+                            Values = { 0 }
+                        }
                     }
                 }
             };
