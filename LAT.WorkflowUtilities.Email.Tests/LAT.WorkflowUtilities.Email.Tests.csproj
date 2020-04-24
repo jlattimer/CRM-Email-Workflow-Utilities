@@ -95,6 +95,7 @@
     <Compile Include="CreateTemplateTests.cs" />
     <Compile Include="CheckAttachmentsTests.cs" />
     <Compile Include="DeleteAttachmentByNameTests.cs" />
+    <Compile Include="EmailBusinessUnitQueueTests.cs" />
     <Compile Include="EmailBusinessUnitTests.cs" />
     <Compile Include="EmailQueueMembersTests.cs" />
     <Compile Include="EmailSecurityRoleTests.cs" />

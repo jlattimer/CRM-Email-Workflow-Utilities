@@ -15,6 +15,8 @@ Custom workflow actions that deal with emails in Dynamics CRM 2015, 2016, & D365
 * CC Queue Members
 * Email Connection 
 * CC Connection 
+* Email Business Unit's default queue
+* CC Business Unit's default queue
 * Delete Email Attachments
 * Delete Email Attachments By Name
 * Send Draft Email
